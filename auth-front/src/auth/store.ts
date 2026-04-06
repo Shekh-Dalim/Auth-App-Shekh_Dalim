@@ -6,9 +6,6 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 const LOCAL_KEY = "app_state";
-//type AuthStatus = "idle" | "authenticating" | "authenticated" | "anonymous";
-
-//global authstate:
 
 type AuthState = {
   accessToken: string | null;
@@ -16,9 +13,8 @@ type AuthState = {
   authStatus: boolean;
   authLoading: boolean;
   login: (loginData: LoginData) => Promise<LoginResponseData>;
-  logout: (silent?: boolean) => void;
+  logout: () => Promise<void>;
   checkLogin: () => boolean | undefined;
-
   changeLocalLoginData: (
     accessToken: string,
     user: User,
@@ -26,7 +22,6 @@ type AuthState = {
   ) => void;
 };
 
-//main logic for global state
 const useAuth = create<AuthState>()(
   persist(
     (set, get) => ({
@@ -42,17 +37,20 @@ const useAuth = create<AuthState>()(
           authStatus,
         });
       },
+
       login: async (loginData) => {
         console.log("started login...");
         set({ authLoading: true });
+
         try {
           const loginResponseData = await loginUser(loginData);
-          console.log(loginResponseData);
+
           set({
             accessToken: loginResponseData.accessToken,
             user: loginResponseData.user,
             authStatus: true,
           });
+
           return loginResponseData;
         } catch (error) {
           console.log(error);
@@ -63,35 +61,33 @@ const useAuth = create<AuthState>()(
           });
         }
       },
-      logout: async (silent = false) => {
+
+      logout: async () => {
         try {
-          //   if (!silent) {
-          //     await logoutUser();
-          //   }
           set({
             authLoading: true,
           });
+
           await logoutUser();
         } catch (error) {
+          console.log(error);
         } finally {
           set({
+            accessToken: null,
+            user: null,
             authLoading: false,
+            authStatus: false,
           });
         }
-        // await logoutUser();
-        set({
-          accessToken: null,
-          user: null,
-          authLoading: false,
-          authStatus: false,
-        });
       },
+
       checkLogin: () => {
-        if (get().accessToken && get().authStatus) return true;
-        else false;
+        if (get().accessToken && get().authStatus) {
+          return true;
+        }
+        return false;
       },
     }),
-
     { name: LOCAL_KEY }
   )
 );
