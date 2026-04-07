@@ -112,7 +112,7 @@ function Signup() {
                   <Input
                     id="name"
                     type="text"
-                    placeholder="John Doe"
+                    placeholder="Your Name "
                     className="pl-10"
                     name="name"
                     value={data.name}
