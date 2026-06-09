@@ -4,18 +4,14 @@ spring:
   profiles:
     active: dev
 
-
 server:
   port: 8082
 
+# configurations
+# database configurations
 
-#configurations
-#database configurations
+# PostgreSQL configurations
 
-#mysql configurations
+# email configurations
 
-
-
-#email configurations
-
-#oauth2 configurations
+# oauth2 configurations
